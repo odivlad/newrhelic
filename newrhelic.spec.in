@@ -3,7 +3,7 @@
 
 Summary: RHEL/CentOS monitoring plugin for New Relic
 Name: newrhelic
-Version: 0.3.0
+Version: @VERSION@
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 #Source0: https://github.com/jduncan-rva/newRHELic/archive/%{name}-%{version}.tar.gz
@@ -20,28 +20,13 @@ Requires: python-psutil
 Requires(post): chkconfig
 Requires(preun): chkconfig
 Requires(preun): initscripts
-Obsoletes: NewRHELic 
+Obsoletes: NewRHELic newrhelic-core newrhelic-common
 Conflicts: NewRHELic
 Vendor: Jamie Duncan <jduncan@redhat.com>
 Url: https://github.com/jduncan-rva/newRHELic
 
-%package common
-Summary: Common files for NewRHELic plugins
-Group: Applications/System
-
-%package core
-Summary: Core Server plugin for New Relic
-Group: Applications/System
-Requires: %{name}-common
-
 %description
 A collection of RHEL-centric plugins for the New Relic Monitoring as a Service platform
-
-%description core
-A Red Hat Enterprise Linux-specific monitoring plugin for New Relic.
-
-%description common
-Common configuration files for NewRHELic plugins
 
 %prep
 %setup -q -n %{name}-%{version}
@@ -52,35 +37,26 @@ Common configuration files for NewRHELic plugins
 %install
 %{__python2} setup.py install -O1 --root=$RPM_BUILD_ROOT
 
-%post core
+%post
 /sbin/chkconfig --add newrhelic-plugin
 
-%preun core
+%preun
 if [ $1 -eq 0]; then
     /sbin/service newrhelic-plugin stop >/dev/null 2>&1
     /sbin/chkconfig --del newrhelic-plugin
 fi
 
-%postun core
+%postun
 if [ "$1" -ge "1" ]; then
     /sbin/service newrhelic-plugin condrestart >/dev/null 2>&1 || :
 fi
 
-%files common
+%files
 %config(noreplace) /etc/newrhelic.conf
-%dir %{python2_sitelib}/newrhelic
-%dir %{python2_sitelib}/newrhelic/plugins
 %config %attr(0755, root, root) %{_initddir}/newrhelic-plugin
-%{python2_sitelib}/newrhelic/__init__.py*
-%{python2_sitelib}/newrhelic/newrhelic.py*
-%{python2_sitelib}/newrhelic-*egg-info
-%{python2_sitelib}/newrhelic/plugins/__init__.py*
-%{python2_sitelib}/newrhelic/_version.py*
+%{python2_sitelib}/newrhelic*
 %{_bindir}/newrhelic
 %{_docdir}/%{name}-%{version}/*
-
-%files core
-%{python2_sitelib}/newrhelic/plugins/core.py*
 
 %changelog
 * Sat Dec 20 2014 Jamie Duncan <jduncan@redhat.com> 0.3.0-1

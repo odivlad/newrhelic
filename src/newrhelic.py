@@ -59,7 +59,7 @@ class NewRHELic:
         try:
             config = ConfigParser.RawConfigParser()
             config.read(self.config_file)
-          
+
             logfilename = config.get('plugin','logfile')
             loglevel = config.get('plugin','loglevel').upper()
             logging.basicConfig(filename=logfilename,
@@ -74,7 +74,7 @@ class NewRHELic:
             raise e
 
         try:
-            # Before we do anything else, we look to make sure we have at least one 
+            # Before we do anything else, we look to make sure we have at least one
             # plugin enabled
             try:
                 raw_plugin_list = config.get('plugin', 'plugin_list')
@@ -108,17 +108,17 @@ class NewRHELic:
             raise e
 
     def _import_plugins(self):
-        ''' 
-        an INCREDIBLY simple plugin loader 
-        it looks in the plugins directory, and gives access to the submodules 
+        '''
+        an INCREDIBLY simple plugin loader
+        it looks in the plugins directory, and gives access to the submodules
         that are listed out in the enabled_plugins entry in /etc/newrhelic.conf
         these are loaded with the _load_plugins() function
         '''
         try:
             p = __import__('plugins', globals(), locals(), self.enabled_plugins_list, -1)
-            
+
             return p
-                
+
         except Exception, e:
             self.logger.exception(e)
             raise e
@@ -134,7 +134,7 @@ class NewRHELic:
         from plugins import core
         x = core.core()
         x.run()
-        
+
         The plugin architecture uses the above naming convention to load the plugin modules and create instances
         Each plugin has it's own class instance that is persisted as long as the daemon is running.
         That allows for counters and other things that require comparison to the previous values to occur within
@@ -201,7 +201,7 @@ class NewRHELic:
             for p in self.plugins:
                 data = p.run()
                 for x in data.keys():
-                    self.metric_data[x] = data[x] 
+                    self.metric_data[x] = data[x]
 
             c_dict['metrics'] = self.metric_data
             c_list.append(c_dict)
@@ -265,7 +265,7 @@ class NewRHELic:
             pass
 
         except BadStatusLine, err:
-            # ran into this error on a test system 
+            # ran into this error on a test system
             # I believe it was the ghost in the machine we never found last year.
             # fixed with #23
             self.logger.error("HTTP Connection Closed Prematurely: %s" % err)

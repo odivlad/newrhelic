@@ -10,7 +10,7 @@ data_files=[
     ('/usr/share/doc/%s-%s'% (name, version), ['doc/README','doc/LICENSE']),
     ('/etc/rc.d/init.d', ['scripts/newrhelic-plugin'])
 ]
- 
+
 setup(
     name=name,
     version=version,

@@ -31,14 +31,14 @@ network : Network Statistics
 memory  : Memory Statistics
 proc    : CPU Statistics (per-cpu for some)
 swap    : Swap Statistics (may be folded into memory down the road)
-    
-To enable: 
-1) add 'core' to the plugin_list parameter in /etc/newrhelic.conf 
+
+To enable:
+1) add 'core' to the plugin_list parameter in /etc/newrhelic.conf
 Example:
 
 plugin_list = core,foo,bar
 
-2) create a [core] config file section and tell the plugin which component you want enabled. 
+2) create a [core] config file section and tell the plugin which component you want enabled.
 Example:
 
 [core]
@@ -97,7 +97,7 @@ class core:
                 format='%(asctime)s [%(levelname)s] %(name)s:%(funcName)s: %(message)s',
             )
             self.logger = logging.getLogger(__name__)
-                  
+
         except Exception, e:
             # Might be nice to properly catch this and emit a nice message?
             # Can't depend on "logger" here
@@ -106,7 +106,7 @@ class core:
         try:
             self.metric_data = dict()
 
-            self.enable_disk = config.getboolean('core', 'enable_disk')            
+            self.enable_disk = config.getboolean('core', 'enable_disk')
             self.enable_net = config.getboolean('core', 'enable_network')
             self.enable_mem = config.getboolean('core', 'enable_memory')
             self.enable_proc = config.getboolean('core', 'enable_proc')
@@ -120,7 +120,7 @@ class core:
 
     def _prep_first_run(self):
         '''
-        This will prime the pump for the initial run, so math looks good from the 
+        This will prime the pump for the initial run, so math looks good from the
         outset. This is run as part of __init__()
         '''
         if self.enable_proc:    # we will prime the cpu buffers This can be refactored later to reuse code as part of _get_cpu_states
@@ -159,7 +159,7 @@ class core:
                 io = psutil.net_io_counters()
             except AttributeError:
                 io = psutil.network_io_counters()
-    
+
             for i in range(len(io)):
                 title = "Component/Network/IO/%s[bytes]" % io._fields[i]
                 val = io[i] - self.buffers[io._fields[i]]
@@ -173,7 +173,7 @@ class core:
     def _get_cpu_states(self):
         # This will get CPU states as a percentage of time
         # used to help calcuate percentage times in the cpu_times_percent function isn't available in psutil
-        # due to the age of the version (affects RHEL 6 and older 
+        # due to the age of the version (affects RHEL 6 and older
         # based on  https://github.com/giampaolo/psutil/blob/master/psutil/__init__.py#L1542-1609
         # since the math isn't too massive computationally, we'll use this universally for now
         # if this is rebased into RHEL 6 we may revisit it then - jduncan
@@ -195,7 +195,7 @@ class core:
 
                 # and finally set the buffer to the current values so the next time the math will be right
                 self.cpu_buffers[field] = t2[field]
-            
+
         except Exception, e:
             self.logger.exception(e)
             pass
@@ -207,7 +207,7 @@ class core:
             cpu_util_agg = psutil.cpu_percent(interval=0)
 
             self.metric_data['Component/CPU/Utilization/Aggregate[percent]'] = cpu_util_agg
-    
+
             for i in range(len(cpu_util)):
                 title = "Component/CPU/Utilization/Processor-%s[percent]" % i
                 self.metric_data[title] = cpu_util[i]
@@ -219,7 +219,7 @@ class core:
         '''returns the 1/5/15 minute load averages'''
         try:
             l = os.getloadavg()
-    
+
             self.metric_data['Component/CPU/Load/1min[avg]'] = l[0]
             self.metric_data['Component/CPU/Load/5min[avg]'] = l[1]
             self.metric_data['Component/CPU/Load/15min[avg]'] = l[2]
@@ -243,7 +243,7 @@ class core:
         '''this will show system-wide disk statistics'''
         try:
             d = psutil.disk_io_counters()
-    
+
             for i in range(len(d)):
                 if d._fields[i] == 'read_time' or d._fields[i] == 'write_time':         #statistics come in multiple units from this output
                     title = "Component/Disk/Read-Write Time/%s[ms]" % d._fields[i]
@@ -294,7 +294,7 @@ class core:
                 elif swap._fields[i] == 'sin' or swap._fields[i] == 'sout':
                     title = "Component/Swap/IO/%s[bytes]" % swap._fields[i]
                     val = swap[i] - self.buffers[swap._fields[i]]
-                    self.buffers[swap._fields[i]] = swap[i] 
+                    self.buffers[swap._fields[i]] = swap[i]
                 else:
                     title = "Component/Swap/IO/%s[bytes]" % swap._fields[i]
                     val = swap[i]
