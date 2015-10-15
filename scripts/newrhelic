@@ -30,8 +30,8 @@ class RunApp:
     def __init__(self):
         self.data = NewRHELic()
         self.stdin_path = '/dev/null'
-        self.stdout_path = '/dev/tty'
-        self.stderr_path = '/dev/tty'
+        self.stdout_path = '/var/log/newrhelic.stdout.log'
+        self.stderr_path = '/var/log/newrhelic.stderr.log'
         self.pidfile_path =  '/var/tmp/newrhelic.pid'
         self.pidfile_timeout = 5
         self.files_preserve = self.getLogFileHandles(self.data.logger)
