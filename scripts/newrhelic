@@ -32,7 +32,7 @@ class RunApp:
         self.stdin_path = '/dev/null'
         self.stdout_path = '/var/log/newrhelic.stdout.log'
         self.stderr_path = '/var/log/newrhelic.stderr.log'
-        self.pidfile_path =  '/var/tmp/newrhelic.pid'
+        self.pidfile_path =  '/var/run/newrhelic.pid'
         self.pidfile_timeout = 5
         self.files_preserve = self.getLogFileHandles(self.data.logger)
 
