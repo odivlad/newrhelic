@@ -59,6 +59,15 @@ fi
 %{_docdir}/%{name}-%{version}/*
 
 %changelog
+* Thu Oct 15 2015 Vladislav Odintsov <odivlad@gmail.com> 0.3.1-1
+- Removed unnessesary rpm subpackages
+- Added makefile for simple work
+- Remove useless file gluster.py
+- Changed logging stdout & stderr to /var/log/newrhelic.std{out,err}.log
+- Some style fixes
+- Enhaced initscript
+- Bump 0.3.1 release
+
 * Sat Dec 20 2014 Jamie Duncan <jduncan@redhat.com> 0.3.0-1
 - bumping version number to reflect the architecture change to a plugin-ish model
 - 0.3.0 release
