@@ -25,23 +25,26 @@ Conflicts: NewRHELic
 Vendor: Jamie Duncan <jduncan@redhat.com>
 Url: https://github.com/jduncan-rva/newRHELic
 
-%package common
-Summary: Common files for NewRHELic plugins
-Group: Applications/System
+%description
+A common package for usage of different RHEL-centric plugins for the New Relic Monitoring as a Service platform
 
-%package core
+
+%package system
 Summary: Core Server plugin for New Relic
 Group: Applications/System
-Requires: %{name}-common
+Requires: %{name}
 
-%description
-A collection of RHEL-centric plugins for the New Relic Monitoring as a Service platform
-
-%description core
+%description system
 A Red Hat Enterprise Linux-specific monitoring plugin for New Relic.
 
-%description common
-Common configuration files for NewRHELic plugins
+
+%package nfs
+Summary: NFS plugin for New Relic
+Group: Applications/System
+Requires: %{name}
+
+%description
+A NFS plugin for New Relic service
 
 %prep
 %setup -q -n %{name}-%{version}
@@ -52,21 +55,23 @@ Common configuration files for NewRHELic plugins
 %install
 %{__python2} setup.py install -O1 --root=$RPM_BUILD_ROOT
 
-%post core
+
+%post
 /sbin/chkconfig --add newrhelic-plugin
 
-%preun core
+%preun
 if [ $1 -eq 0]; then
     /sbin/service newrhelic-plugin stop >/dev/null 2>&1
     /sbin/chkconfig --del newrhelic-plugin
 fi
 
-%postun core
+%postun
 if [ "$1" -ge "1" ]; then
     /sbin/service newrhelic-plugin condrestart >/dev/null 2>&1 || :
 fi
 
-%files common
+
+%files
 %config(noreplace) /etc/newrhelic.conf
 %dir %{python2_sitelib}/newrhelic
 %dir %{python2_sitelib}/newrhelic/plugins
@@ -79,8 +84,12 @@ fi
 %{_bindir}/newrhelic
 %{_docdir}/%{name}-%{version}/*
 
-%files core
-%{python2_sitelib}/newrhelic/plugins/core.py*
+%files system
+%{python2_sitelib}/newrhelic/plugins/system/*    # here core.py; common Linux monitoring files
+
+%files nfs
+%{python2_sitelib}/newrhelic/plugins/nfs/*       # here nfsiostat.py, plugins.py; NFS-specific files
+
 
 %changelog
 * Sat Dec 20 2014 Jamie Duncan <jduncan@redhat.com> 0.3.0-1
