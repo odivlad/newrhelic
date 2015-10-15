@@ -20,14 +20,26 @@ config="/etc/newrhelic.conf"
 
 lockfile=/var/lock/subsys/$prog
 
+go_start(){
+    echo  -n $"Starting $prog:"
+    /usr/bin/newrhelic start && success || failure
+    echo
+}
+
+go_stop(){
+    echo -n $"Stopping $prog:"
+    /usr/bin/newrhelic stop && success || failure
+    echo
+}
+
 start() {
-    echo -e $"Starting $prog:"
-    /usr/bin/newrhelic start &
+    rh_status 2>&1 > /dev/null
+    [ $? -ne 0 ] && go_start || echo "$prog is already running!"
 }
 
 stop() {
-    echo -e $"Stopping $prog:"
-    /usr/bin/newrhelic stop &
+    rh_status 2>&1 > /dev/null
+    [ $? -ne 3 ] && go_stop || echo "$prog is already stopped!"
 }
 
 restart() {
